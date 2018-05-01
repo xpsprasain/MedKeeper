@@ -29,12 +29,15 @@ class Application(Text):
 
         self.medic_peices = Label(master, text="No. of peices: ")
 
+        self.medic_price = Label(master, text="Price of box: ")
+
         self.medicine_name.place(x=0, y=60)
         self.company_name.place(x=0, y=100)
         self.expiry_date.place(x=0, y=140)
         self.medic_type.place(x=0, y=180)
         self.medic_boxes.place(x=0, y=320)
         self.medic_peices.place(x=0, y=360)
+        self.medic_price.place(x=0, y=400)
 
         # entries for labels
         self.medicine = StringVar()
@@ -65,6 +68,9 @@ class Application(Text):
         self.peices = IntVar()
         self.peices_ent = Entry(master, width=30, textvariable=self.peices).place(x=150, y=361)
 
+        self.price = IntVar()
+        self.price_ent = Entry(master, width=30, textvariable=self.price).place(x=150, y=401)
+
         # button to perform  #dynamic data entry takes exa  Qctly one argument
         self.submit = Button(master, text="Add To Database", command=self.dynamic_data_entry, width=20, height=2).place(
             x=400, y=450)
@@ -91,7 +97,7 @@ class Application(Text):
     def dynamic_data_entry(self):
         # creating the database if it doesn't exist
         cursor_object.execute(
-            "CREATE TABLE IF NOT EXISTS medicine_db(date_issued TEXT, medicine_name TEXT, company_name TEXT, expiry_date TEXT, medicine_type TEXT, no_of_boxes TEXT,no_of_peices TEXT, total TEXT )")
+            "CREATE TABLE IF NOT EXISTS medicine_db(date_issued TEXT, medicine_name TEXT, company_name TEXT, expiry_date TEXT, medicine_type TEXT, no_of_boxes TEXT,no_of_peices TEXT, total TEXT, prices TEXT )")
 
         # adding fields and values to the database
         unix = time.time()
@@ -123,12 +129,14 @@ class Application(Text):
         no_of_boxes = self.boxes.get()
         no_of_pieces = self.peices.get()
 
+        price_of_medicine = self.price.get()
+
         # if self.boxes == str() or self.peices == str():
         #     messagebox.showwarning("Please input number not string.")
         # else:
         #     pass
         if len(medicine_name) == 0 or len(company_name) == 0 or len(expiry_date) == 0 or len(
-                medicine_type) == 0 or no_of_boxes == 0 or no_of_pieces == 0:
+                medicine_type) == 0 or no_of_boxes == 0 or no_of_pieces == 0 or price_of_medicine == 0:
             # print("Failed. Please Fill up all the information")
             messagebox.showwarning("Failed", "Please don't leave anything blank.")
         else:
@@ -141,9 +149,9 @@ class Application(Text):
             no_of_boxes = str(no_of_boxes)
 
             cursor_object.execute(
-                "INSERT INTO medicine_db (date_issued, medicine_name, company_name, expiry_date, medicine_type , no_of_boxes ,no_of_peices, total ) VALUES (?,?, ?, ?, ? ,?, ?, ?)",
+                "INSERT INTO medicine_db (date_issued, medicine_name, company_name, expiry_date, medicine_type , no_of_boxes ,no_of_peices, total, prices ) VALUES (?,?, ?, ?, ? ,?, ?, ?, ?)",
                 (
-                date_issued, medicine_name, company_name, expiry_date, medicine_type, no_of_boxes, no_of_pieces, total))
+                date_issued, medicine_name, company_name, expiry_date, medicine_type, no_of_boxes, no_of_pieces, total, price_of_medicine))
             conn.commit()
             self.box.insert(END, (
                     'Logs: Added \nName: ' + medicine_name.upper() + "\nCompany: " + company_name.upper() + "\nExpires at: " + expiry_date + "\nMedicine type: " + medicine_type.upper() + "\nNo. of boxes: " + no_of_boxes + "\nNo. of pieces: " + no_of_pieces + "\nTotal: " + total + "\n========================================================\n"))
@@ -195,6 +203,7 @@ class Application(Text):
 
             def add_it(self):
                 class Stan(Text):
+
                     def __init__(self, xps):
                         Text.__init__(self, xps)
                         # self.total =
@@ -210,6 +219,10 @@ class Application(Text):
 
                         self.med_quantity = Label(xps, text="Quantity", font='arial 15')
                         self.med_quantity.place(x=0, y=160)
+
+                        self.med_price = Label(xps, text="Price", font='arial 15')
+                        self.med_price.place(x=0, y=220)
+
 
                         # unix = time.time()
                         # date_purchased = str(datetime.datetime.fromtimestamp(unix).strftime(
@@ -228,10 +241,12 @@ class Application(Text):
                         self.med_quantity = Entry(xps, width=30)
                         self.med_quantity.place(x=280, y=160)
 
+                        self.med_price = Entry(xps, width=30)
+                        self.med_price.place(x=280, y=220)
+
                         # button to make issue right
                         self.doneee = Button(xps, text="Done", width=20, height=2, command=self.done).place(x=0, y=340)
-                        self.exit = Button(xps, text="Exit", width=20, height=2, command=xps.destroy).place(x=200,
-                                                                                                            y=340)
+                        self.exit = Button(xps, text="Exit", width=20, height=2, command=xps.destroy).place(x=200,y=340)
 
                         self.logs = Text(xps, height=16, width=45)
                         self.logs.place(x=550, y=60)
@@ -243,17 +258,18 @@ class Application(Text):
                         # self.date_bought = self.datee.get()
 
                         # self.available_medicine = self.total.get()
+                        # self.
 
-                        # conn = sqlite3.connect("medicines.db")
-                        # cursor_object = conn.cursor()
-                        # cursor_object.execute(
-                        #     "SELECT total,medicine_name FROM medicine_db",
-                        #     (self.quantity,self.med_name))
-                        # conn.commit()
-                        #
-                        # cursor_object.execute(
-                        #     "UPDATE medicine_db SET total = ? WHERE medicine_name = ?", (self.quantity, self.med_name))
-                        # conn.commit()
+                        conn = sqlite3.connect("medicines.db")
+                        cursor_object = conn.cursor()
+                        cursor_object.execute(
+                            "SELECT total,medicine_name FROM medicine_db",
+                            (self.quantity,self.med_name))
+                        conn.commit()
+
+                        cursor_object.execute(
+                            "UPDATE medicine_db SET total = ? WHERE medicine_name = ?", (self.quantity, self.med_name))
+                        conn.commit()
 
                         if self.buyer == '' or self.med_name == '' or self.quantity == '':
                             messagebox.showwarning("Error", "Please Fill The Missing Boxes")
@@ -265,37 +281,6 @@ class Application(Text):
                             # d = Search(Search)
                             another_window.mainloop()
                         else:
-
-                            # conn_db = sqlite3.connect("medicines.db")
-                            # cursor_object = conn.cursor()
-                            # free = self.name_of_medicine.get()
-                            # cursor_object.execute(
-                            #     "SELECT * FROM medicine_db WHERE medicine_name LIKE ?",
-                            #     (free,))
-                            # conn_db.commit()
-                            #
-                            # if len(free) == 0:
-                            #     # print("Failed. Please Fill up all the information")
-                            #     messagebox.showwarning("Failed",
-                            #                            "Please enter the name of the medicine you want to search.")
-                            # else:
-                            #     for self.row in cursor_object.fetchall():  # it put the values to listbox, fetchall() to grab all the values to the rows
-                            #         if self.row == None:
-                            #             messagebox.showinfo("Sorry, No such medicine found.")
-                            #             self.sbox.insert(END, "No Such medicine found in the database.")
-                            #         else:
-                            #             # self.sbox.insert(END,"Found")
-                            #             self.sbox.insert(END,
-                            #                              ("Entered on: " + self.row[0].upper() + "\nName: " + self.row[
-                            #                                  1].upper() + "\nCompany: " + self.row[
-                            #                                   2].upper() + "\nExpires on " + self.row[
-                            #                                   3] + "\nType: " + self.row[
-                            #                                   4] + "\nTotal boxes: " + self.row[5] + "\nQuantity: " +
-                            #                               self.row[
-                            #                                   7] + "\n--------------------------------------------"))
-                            #     # dynamic_data_entry()
-                            #     conn_db.commit()
-                            #     conn_db.close()
 
                             content = (
                                     self.buyer.upper() + " bought " + self.quantity + " " + self.med_name.upper() + " " + " on: " + self.datee + "\n=====================" + "\n")
